@@ -1,14 +1,14 @@
-import { Router } from "express";
+import { Request, Response, Router } from "express";
 
 const userRouter = Router();
 
-userRouter.get("/users", (req, res) => {
+userRouter.get("/users", (req: Request, res: Response) => {
   res.send("users");
 });
-userRouter.get("/users/:email", (req, res) => {
+userRouter.get("/users/:email", (req: Request, res: Response) => {
   res.send("users/rakib");
 });
-userRouter.delete("/users/:id", (req, res) => {
+userRouter.delete("/users/:id", (req: Request, res: Response) => {
   res.send("users/rakib");
 });
 
