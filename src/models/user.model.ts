@@ -1,21 +1,49 @@
 import mongoose, { Model, Schema } from "mongoose";
 
 export interface IUser extends Document {
-  name: string;
   email: string;
-  password: string;
+  username: string;
+  password?: string;
+  name?: string;
+  bio?: string;
+  location?: string;
+  profileImage?: string;
+  coverImage?: string;
+  isVerified: boolean;
+  education?: [
+    {
+      institute: string;
+      degree: string;
+      image: string;
+      startYear: string;
+      endYear: string;
+      gpa: string;
+    }
+  ];
+  experience?: [
+    {
+      title: string;
+      company: string;
+      image: string;
+      startYear: string;
+      endYear: string;
+      duration: string;
+    }
+  ];
+  about?: string;
+  authType?: string;
+  role?: string;
+  lastLogin: Date;
   createdAt?: Date;
   updatedAt?: Date;
 }
 const userSchema: Schema<IUser> = new mongoose.Schema(
   {
-    name: {
+    username: {
       type: String,
-      required: [true, "User name is required"],
-      trim: true,
       unique: true,
-      minLength: 2,
-      maxLength: 50,
+      required: [true, "Username is required"],
+      lowercase: true,
     },
     email: {
       type: String,
@@ -27,8 +55,59 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: [true, "User Password is required"],
-      minLength: 8,
+      minlength: 8,
+    },
+    name: {
+      type: String,
+    },
+    bio: {
+      type: String,
+      maxlength: [100, "Bio cannot exceed 100 characters"],
+    },
+    location: {
+      type: String,
+    },
+
+    profileImage: {
+      type: String,
+    },
+    coverImage: {
+      type: String,
+    },
+
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    education: [
+      {
+        institute: { type: String },
+        degree: { type: String },
+        image: { type: String },
+        startYear: { type: String },
+        endYear: { type: String },
+        gpa: { type: String },
+      },
+    ],
+    experience: [
+      {
+        title: { type: String },
+        company: { type: String },
+        image: { type: String },
+        startYear: { type: String },
+        endYear: { type: String },
+        duration: { type: String },
+      },
+    ],
+    about: {
+      type: String,
+      maxlength: [2000, "about cannot exceed 2000 characters"],
+    },
+    authType: { type: String, default: 'credentials' },
+    role: { type: String, default: 'user' },
+    lastLogin: {
+      type: Date,
+      default: Date.now,
     },
   },
   { timestamps: true }
