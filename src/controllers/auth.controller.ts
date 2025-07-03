@@ -1,3 +1,168 @@
+// import mongoose from "mongoose";
+// import bcrypt from "bcryptjs";
+// import jwt from "jsonwebtoken";
+// import { JWT_EXPIRES_IN, JWT_SECRET } from "../config/env.js";
+// import User from "../models/user.model.js";
+// import { NextFunction, Request, Response } from "express";
+// import cookie from "cookie";
+
+// const createToken = (userId: string) => {
+//   return jwt.sign({ userId }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+// };
+
+// const setTokenCookie = (res: Response, token: string) => {
+//   res.setHeader(
+//     "Set-Cookie",
+//     cookie.serialize("token", token, {
+//       httpOnly: true,
+//       secure: process.env.NODE_ENV === "production",
+//       sameSite: "strict",
+//       path: "/",
+//       maxAge: 60 * 60 * 24 * 7,
+//     })
+//   );
+// };
+
+// export const signUp = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) => {
+//   const session = await mongoose.startSession();
+//   session.startTransaction();
+
+//   try {
+//     const { username, email, password } = req.body;
+//     if (!email || !username) {
+//       throw new Error("All fields are required");
+//     }
+//     const emailAlreadyExists = await User.findOne({ email });
+//     if (emailAlreadyExists) {
+//       return res
+//         .status(400)
+//         .json({ success: false, message: "User already exists" });
+//     }
+//     const usernameAlreadyExists = await User.findOne({ username });
+//     if (usernameAlreadyExists) {
+//       return res
+//         .status(400)
+//         .json({ success: false, message: "username already taken" });
+//     }
+
+//     const salt = await bcrypt.genSalt(10);
+//     const hashedPassword = await bcrypt.hash(password, salt);
+
+//     const newUser = await User.create(
+//       [
+//         {
+//           username,
+//           email,
+//           password: hashedPassword,
+//         },
+//       ],
+//       { session }
+//     );
+//     const token = createToken(newUser[0]._id.toString());
+//     await session.commitTransaction();
+//     session.endSession();
+
+//     setTokenCookie(res, token);
+//     res.status(201).json({
+//       success: true,
+//       message: "User created successfully",
+//       data: {
+//         token,
+//         user: newUser,
+//       },
+//     });
+//   } catch (error) {
+//     await session.abortTransaction();
+//     session.endSession();
+//     next(error);
+//   }
+// };
+
+// export const signIn = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) => {
+//   try {
+//     const { email, password } = req.body;
+//     const user = await User.findOne({ email });
+//     if (!user) {
+//       const error = new Error("User not Found");
+//       error.statusCode = 404;
+//       throw error;
+//     }
+
+//     const isPasswordValid = await bcrypt.compare(password, user.password);
+
+//     if (!isPasswordValid) {
+//       const error = new Error("Invalid password");
+//       error.statusCode = 401;
+//       throw error;
+//     }
+
+//     const token = createToken(user._id.toString());
+//     setTokenCookie(res, token);
+//     console.log("Token cookie set done");
+//     res.status(200).json({
+//       success: true,
+//       message: "User signed in successfully",
+//       data: {
+//         token,
+//         user,
+//       },
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+// export const socialSignIn = async (req, res, next) => {
+//   try {
+//     const { name, email, username, profileImage } = req.body;
+
+//     if (!email || !username || !name) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Name, Email, and Username are required",
+//       });
+//     }
+
+//     let user = await User.findOne({ email });
+
+//     if (!user) {
+//       user = new User({
+//         name,
+//         email,
+//         username,
+//         profileImage,
+//         authType: "social",
+//       });
+
+//       await user.save();
+//     }
+
+//     const token = createToken(user._id.toString());
+//     setTokenCookie(res, token);
+//     res.status(201).json({
+//       success: true,
+//       message: "Social user signin successfully",
+//       data: { user },
+//     });
+//   } catch (error) {
+//     console.error("Social Sign-In Error:", error.message);
+//     res.status(500).json({
+//       success: false,
+//       message: "Internal server error",
+//     });
+//   }
+// };
+
+// export const signOut = async (req, res, next) => {};
+
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -90,6 +255,9 @@ export const signIn = async (
       expiresIn: JWT_EXPIRES_IN,
     });
 
+    res.cookie("token", token, {
+      httpOnly: true,
+    });
     res.status(200).json({
       success: true,
       message: "User signed in successfully",
@@ -103,8 +271,6 @@ export const signIn = async (
   }
 };
 
-
-
 export const socialSignIn = async (req, res, next) => {
   try {
     const { name, email, username, profileImage } = req.body;
@@ -112,7 +278,7 @@ export const socialSignIn = async (req, res, next) => {
     if (!email || !username || !name) {
       return res.status(400).json({
         success: false,
-        message: 'Name, Email, and Username are required',
+        message: "Name, Email, and Username are required",
       });
     }
 
@@ -124,7 +290,7 @@ export const socialSignIn = async (req, res, next) => {
         email,
         username,
         profileImage,
-        authType: 'social',
+        authType: "social",
       });
 
       await user.save();
@@ -132,19 +298,16 @@ export const socialSignIn = async (req, res, next) => {
 
     res.status(201).json({
       success: true,
-      message: 'Social user signin successfully',
+      message: "Social user signin successfully",
       data: { user },
     });
   } catch (error) {
-    console.error('Social Sign-In Error:', error.message);
+    console.error("Social Sign-In Error:", error.message);
     res.status(500).json({
       success: false,
-      message: 'Internal server error',
+      message: "Internal server error",
     });
   }
 };
 
-
 export const signOut = async (req, res, next) => {};
-
-

@@ -33,6 +33,9 @@ export interface IUser extends Document {
   about?: string;
   authType?: string;
   role?: string;
+  follower: number;
+  following: number;
+  friend: number;
   lastLogin: Date;
   createdAt?: Date;
   updatedAt?: Date;
@@ -103,8 +106,11 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
       type: String,
       maxlength: [2000, "about cannot exceed 2000 characters"],
     },
-    authType: { type: String, default: 'credentials' },
-    role: { type: String, default: 'user' },
+    authType: { type: String, default: "credentials" },
+    role: { type: String, default: "user" },
+    follower: { type: Number, default: 0 },
+    following: { type: Number, default: 0 },
+    friend: { type: Number, default: 0 },
     lastLogin: {
       type: Date,
       default: Date.now,
