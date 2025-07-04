@@ -16,7 +16,6 @@ const userRouter = Router();
 // all users
 userRouter.get("/", getUsers);
 
-// signgal users
 userRouter.get("/:email", getUser);
 userRouter.get("/username/:username", getUserByUsername);
 

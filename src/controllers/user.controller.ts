@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import User from "../models/user.model.js";
-
+interface HttpError extends Error {
+  statusCode?: number;
+}
 // All user
 
 export const getUsers = async (
@@ -32,7 +34,7 @@ export const getUser = async (
     );
 
     if (!user) {
-      const error = new Error("User not found");
+      const error = new Error("User not found") as HttpError;
       error.statusCode = 404;
       throw error;
     }
@@ -58,7 +60,7 @@ export const getUserByUsername = async (
     }).select("-password");
 
     if (!user) {
-      const error: any = new Error("User not found");
+      const error = new Error("User not found") as HttpError;
       error.statusCode = 404;
       throw error;
     }
@@ -82,7 +84,7 @@ export const updateInfo = async (
     const updateData = {
       name: req.body.name,
       bio: req.body.bio,
-      location: req.body.location,
+      locations: req.body.locations,
       profileImage: req.body.profileImage,
       coverImage: req.body.coverImage,
     };
@@ -123,7 +125,7 @@ export const updateAbout = async (
     ).select("-password");
 
     if (!updatedUser) {
-      const error: any = new Error("User not found");
+      const error = new Error("User not found") as HttpError;
       error.statusCode = 404;
       throw error;
     }
@@ -140,7 +142,7 @@ export const updateAbout = async (
 
 // Education
 
-export const addEducation = async (req, res) => {
+export const addEducation = async (req: Request, res: Response) => {
   try {
     const { email } = req.params;
     const newEducation = req.body;
@@ -162,25 +164,29 @@ export const addEducation = async (req, res) => {
   }
 };
 
-export const updateEducation = async (req, res) => {
+export const updateEducation = async (req: Request, res: Response) => {
   try {
     const { email, id } = req.params;
     const updatedEducation = req.body;
 
     const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ message: "User not found" });
-
+    if (!user.education || !Array.isArray(user.education)) {
+      return res.status(404).json({ message: "No education records found" });
+    }
     // Check if education exists
-    const educationEntry = user.education.id(id); // Mongoose subdocument method
+    const educationEntry = user.education.id(id);
 
     if (!educationEntry) {
       return res.status(404).json({ message: "Education entry not found" });
     }
 
     // Update fields
-    Object.keys(updatedEducation).forEach((key) => {
-      educationEntry[key] = updatedEducation[key];
-    });
+    // Object.keys(updatedEducation).forEach((key) => {
+    //   educationEntry[key] = updatedEducation[key];
+    // });
+
+    Object.assign(educationEntry, updatedEducation);
 
     await user.save();
 
@@ -189,13 +195,14 @@ export const updateEducation = async (req, res) => {
       education: educationEntry,
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    const err = error as Error;
+    res.status(500).json({ message: "Server error", error: err.message });
   }
 };
 
 // experience
 
-export const addExperience = async (req, res) => {
+export const addExperience = async (req: Request, res: Response) => {
   try {
     const { email } = req.params;
     const newExperience = req.body;
@@ -217,7 +224,7 @@ export const addExperience = async (req, res) => {
   }
 };
 
-export const updateExperience = async (req, res) => {
+export const updateExperience = async (req: Request, res: Response) => {
   try {
     const { email, id } = req.params;
     const updatedExperience = req.body;
@@ -233,9 +240,13 @@ export const updateExperience = async (req, res) => {
     }
 
     // Update fields
-    Object.keys(updatedExperience).forEach((key) => {
-      experienceEntry[key] = updatedExperience[key];
-    });
+
+    // Object.entries(updatedExperience).forEach(([key, value]) => {
+    //   const k = key as keyof typeof updatedExperience;
+    //   experienceEntry[k] = value;
+    // });
+
+    Object.assign(experienceEntry, updatedExperience);
 
     await user.save();
 
@@ -244,6 +255,7 @@ export const updateExperience = async (req, res) => {
       experience: experienceEntry,
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    const err = error as Error;
+    res.status(500).json({ message: "Server error", error: err.message });
   }
 };

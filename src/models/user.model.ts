@@ -1,4 +1,22 @@
-import mongoose, { Model, Schema } from "mongoose";
+import mongoose, { Model, Schema, Types } from "mongoose";
+
+interface IEducation extends Document {
+  institute: string;
+  degree: string;
+  image: string;
+  startYear: string;
+  endYear: string;
+  gpa: string;
+}
+
+interface IExperience extends Document {
+  title: string;
+  company: string;
+  image: string;
+  startYear: string;
+  endYear: string;
+  duration: string;
+}
 
 export interface IUser extends Document {
   email: string;
@@ -6,30 +24,12 @@ export interface IUser extends Document {
   password?: string;
   name?: string;
   bio?: string;
-  location?: string;
+  locations?: string;
   profileImage?: string;
   coverImage?: string;
   isVerified: boolean;
-  education?: [
-    {
-      institute: string;
-      degree: string;
-      image: string;
-      startYear: string;
-      endYear: string;
-      gpa: string;
-    }
-  ];
-  experience?: [
-    {
-      title: string;
-      company: string;
-      image: string;
-      startYear: string;
-      endYear: string;
-      duration: string;
-    }
-  ];
+  education: Types.DocumentArray<IEducation>;
+  experience: Types.DocumentArray<IExperience>;
   about?: string;
   authType?: string;
   role?: string;
@@ -40,6 +40,33 @@ export interface IUser extends Document {
   createdAt?: Date;
   updatedAt?: Date;
 }
+
+// === Subdocument Schemas ===
+
+const EducationSchema = new Schema<IEducation>(
+  {
+    institute: { type: String },
+    degree: { type: String },
+    image: { type: String },
+    startYear: { type: String },
+    endYear: { type: String },
+    gpa: { type: String },
+  },
+  { _id: true }
+);
+
+const ExperienceSchema = new Schema<IExperience>(
+  {
+    title: { type: String },
+    company: { type: String },
+    image: { type: String },
+    startYear: { type: String },
+    endYear: { type: String },
+    duration: { type: String },
+  },
+  { _id: true }
+);
+
 const userSchema: Schema<IUser> = new mongoose.Schema(
   {
     username: {
@@ -67,7 +94,7 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
       type: String,
       maxlength: [100, "Bio cannot exceed 100 characters"],
     },
-    location: {
+    locations: {
       type: String,
     },
 
@@ -82,26 +109,8 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    education: [
-      {
-        institute: { type: String },
-        degree: { type: String },
-        image: { type: String },
-        startYear: { type: String },
-        endYear: { type: String },
-        gpa: { type: String },
-      },
-    ],
-    experience: [
-      {
-        title: { type: String },
-        company: { type: String },
-        image: { type: String },
-        startYear: { type: String },
-        endYear: { type: String },
-        duration: { type: String },
-      },
-    ],
+    education: [EducationSchema],
+    experience: [ExperienceSchema],
     about: {
       type: String,
       maxlength: [2000, "about cannot exceed 2000 characters"],

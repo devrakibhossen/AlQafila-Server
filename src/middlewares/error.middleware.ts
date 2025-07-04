@@ -1,26 +1,37 @@
-const errorMiddleware = (err, req, res, next) => {
+import { NextFunction, Request, Response } from "express";
+interface CustomError extends Error {
+  statusCode?: number;
+  code?: number;
+  errors?: Record<string, { message: string }>;
+}
+const errorMiddleware = (
+  err: CustomError,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    let error = { ...err };
-    error.message = err.message;
-    console.error(err);
+    // let error = { ...err };
+    let statusCode = err.statusCode || 500;
+    let message = err.message || "Internal Server Error";
     if (err.name === "CastError") {
-      const message = "Resource not found";
-      error = new Error(message);
-      error.statusCode = 404;
+      message = "Resource not found";
+      statusCode = 404;
     }
     if (err.code === 11000) {
-      const message = "Duplicate field value entered";
-      error = new Error(message);
-      error.statusCode = 400;
+      message = "Duplicate field value entered";
+      statusCode = 400;
     }
-    if (err.name === "ValidationError") {
-      const message = Object.values(err.error).map((val) => val.message);
-      error = new Error(message.join(", "));
-      error.statusCode = 400;
+    if (err.name === "ValidationError" && err.errors) {
+      message = Object.values(err.errors)
+        .map((val) => val.message)
+        .join(", ");
+      statusCode = 400;
     }
-    res
-      .status(error.statusCode || 500)
-      .json({ success: false, error: error.message || "Server error" });
+    res.status(statusCode).json({
+      success: false,
+      message,
+    });
   } catch (error) {
     next(error);
   }
