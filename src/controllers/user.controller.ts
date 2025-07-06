@@ -95,8 +95,8 @@ export const updateInfo = async (
     ).select("-password");
 
     if (!updatedUser) {
-      const error = new Error("User not found");
-      (error as any).statusCode = 404;
+      const error = new Error("User not found") as HttpError;
+      error.statusCode = 404;
       throw error;
     }
 
@@ -142,7 +142,11 @@ export const updateAbout = async (
 
 // Education
 
-export const addEducation = async (req: Request, res: Response) => {
+export const addEducation = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { email } = req.params;
     const newEducation = req.body;
@@ -160,11 +164,15 @@ export const addEducation = async (req: Request, res: Response) => {
       education: user.education,
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+    next(error);
   }
 };
 
-export const updateEducation = async (req: Request, res: Response) => {
+export const updateEducation = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { email, id } = req.params;
     const updatedEducation = req.body;
@@ -195,14 +203,17 @@ export const updateEducation = async (req: Request, res: Response) => {
       education: educationEntry,
     });
   } catch (error) {
-    const err = error as Error;
-    res.status(500).json({ message: "Server error", error: err.message });
+    next(error);
   }
 };
 
 // experience
 
-export const addExperience = async (req: Request, res: Response) => {
+export const addExperience = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { email } = req.params;
     const newExperience = req.body;
@@ -220,11 +231,15 @@ export const addExperience = async (req: Request, res: Response) => {
       experience: user.experience,
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+    next(error);
   }
 };
 
-export const updateExperience = async (req: Request, res: Response) => {
+export const updateExperience = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { email, id } = req.params;
     const updatedExperience = req.body;
@@ -255,7 +270,6 @@ export const updateExperience = async (req: Request, res: Response) => {
       experience: experienceEntry,
     });
   } catch (error) {
-    const err = error as Error;
-    res.status(500).json({ message: "Server error", error: err.message });
+    next(error);
   }
 };

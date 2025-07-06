@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { RequestHandler, Router } from "express";
 import {
   addPost,
   deletePost,
@@ -8,7 +8,7 @@ import {
 
 const postRouter = Router();
 
-postRouter.post("/", addPost);
+postRouter.post("/", addPost as RequestHandler);
 postRouter.get("/", getPost);
 postRouter.delete("/:id", deletePost);
 postRouter.put("/:id", updatePost);

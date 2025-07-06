@@ -1,9 +1,11 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import { JWT_EXPIRES_IN, JWT_SECRET } from "../config/env.js";
+// import jwt from "jsonwebtoken";
+// import { JWT_EXPIRES_IN, JWT_SECRET } from "../config/env.js";
 import User from "../models/user.model.js";
 import { NextFunction, Request, Response } from "express";
+// import { JWT_EXPIRES_IN, JWT_SECRET } from "../config/env.js";
+import { generateToken } from "../utils/jwt.js";
 interface HttpError extends Error {
   statusCode?: number;
 }
@@ -48,16 +50,15 @@ export const signUp = async (
       { session }
     );
 
-    const token = jwt.sign({ userId: newUser[0]._id }, JWT_SECRET, {
-      expiresIn: JWT_EXPIRES_IN,
-    });
+    // const token = jwt.sign({ userId: newUser[0]._id }, JWT_SECRET, {
+    //   expiresIn: JWT_EXPIRES_IN,
+    // });
     await session.commitTransaction();
     session.endSession();
     res.status(201).json({
       success: true,
       message: "User created successfully",
       data: {
-        token,
         user: newUser,
       },
     });
@@ -94,13 +95,25 @@ export const signIn = async (
       throw error;
     }
 
-    const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
-      expiresIn: JWT_EXPIRES_IN,
-    });
+    // if (!JWT_SECRET || !JWT_EXPIRES_IN) {
+    //   throw new Error("JWT_SECRET or JWT_EXPIRES_IN is not defined");
+    // }
+
+    // const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
+    //   expiresIn: JWT_EXPIRES_IN,
+    // });
+
+    // res.cookie("token", token, {
+    //   httpOnly: true,
+    // });
+    const token = generateToken({ userId: user._id });
 
     res.cookie("token", token, {
       httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
     });
+
     res.status(200).json({
       success: true,
       message: "User signed in successfully",

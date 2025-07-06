@@ -1,4 +1,4 @@
-import mongoose, { Model, Schema } from "mongoose";
+import mongoose, { Model, Schema, Document } from "mongoose";
 
 export interface IMediaImage {
   type: "image";
@@ -32,7 +32,7 @@ export interface IPost extends Document {
   hashtags?: string[];
   reactions?: IReactions;
   shares?: number;
-  images?: IMediaImage;
+  images?: IMediaImage[];
   video?: IMediaVideo;
   createdAt?: Date;
   updatedAt?: Date;
