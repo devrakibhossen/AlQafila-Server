@@ -95,17 +95,6 @@ export const signIn = async (
       throw error;
     }
 
-    // if (!JWT_SECRET || !JWT_EXPIRES_IN) {
-    //   throw new Error("JWT_SECRET or JWT_EXPIRES_IN is not defined");
-    // }
-
-    // const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
-    //   expiresIn: JWT_EXPIRES_IN,
-    // });
-
-    // res.cookie("token", token, {
-    //   httpOnly: true,
-    // });
     const token = generateToken({ userId: user._id });
 
     res.cookie("token", token, {
