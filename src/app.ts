@@ -9,18 +9,11 @@ import connectToDatabase from "./database/mongodb.js";
 import errorMiddleware from "./middlewares/error.middleware.js";
 import friendRequestRouter from "./routes/friend.routes.js";
 import followRouter from "./routes/follow.routes.js";
-// import { Server as SocketIOServer } from "socket.io";
-// import * as http from "http";
+import { Server } from "socket.io";
+import * as http from "http";
 
 const app = express();
 
-// const server = http.createServer(app);
-// export const io = new SocketIOServer(server, {
-//   cors: {
-//     origin: "*",
-//     methods: ["GET", "POST"],
-//   },
-// });
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -32,32 +25,23 @@ app.use("/api/v1/posts", postRouter);
 app.use("/api/v1/friend", friendRequestRouter);
 app.use("/api/v1/follow", followRouter);
 app.use(errorMiddleware);
+const server = http.createServer(app);
+export const io = new Server(server);
+
 app.get("/", (req, res) => {
   res.send("Welcome to the Alqafila api !");
 });
 
-// io.on("connection", (socket) => {
-//   console.log("🟢 A user connected:", socket.id);
+io.on("connection", (socket) => {
+  console.log("🟢 A user connected:", socket.id);
 
-//   socket.on("disconnect", () => {
-//     console.log("🔴 A user disconnected:", socket.id);
-//   });
-// });
-app.listen(PORT, async () => {
+  socket.on("disconnect", () => {
+    console.log("🔴 A user disconnected:", socket.id);
+  });
+});
+
+server.listen(PORT, async () => {
   console.log(`Alqafila api is running on  http://localhost:${PORT}`);
-
-  // await connectToDatabase();
 });
 
 connectToDatabase();
-
-// (async () => {
-//   try {
-//     await connectToDatabase();
-//     server.listen(PORT, () => {
-//       console.log(`Alqafila api is running on http://localhost:${PORT}`);
-//     });
-//   } catch (error) {
-//     console.error("Failed to connect to database", error);
-//   }
-// })();
