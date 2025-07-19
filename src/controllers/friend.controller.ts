@@ -114,3 +114,22 @@ export const deleteFriendRequest = async (
     next(error);
   }
 };
+
+export const getMyFriendRequests = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+
+    const requests = await FriendRequest.find({
+      receiver: id,
+      status: "pending",
+    }).populate("sender", "name username email profileImage");
+
+    res.status(200).json(requests);
+  } catch (error) {
+    next(error);
+  }
+};

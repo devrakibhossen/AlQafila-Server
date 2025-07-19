@@ -2,6 +2,7 @@ import { RequestHandler, Router } from "express";
 import {
   acceptFriendRequest,
   deleteFriendRequest,
+  getMyFriendRequests,
   sendFriendRequest,
 } from "../controllers/friend.controller.js";
 
@@ -17,6 +18,10 @@ friendRequestRouter.post(
 friendRequestRouter.delete(
   "/delete-requests/:id",
   deleteFriendRequest as RequestHandler
+);
+friendRequestRouter.get(
+  "/myFriendRequests/:id",
+  getMyFriendRequests as RequestHandler
 );
 
 export default friendRequestRouter;

@@ -11,10 +11,12 @@ const friendRequestSchema: Schema<IFriendRequest> = new mongoose.Schema(
   {
     sender: {
       type: Schema.Types.ObjectId,
+      ref: "User",
       required: true,
     },
     receiver: {
       type: Schema.Types.ObjectId,
+      ref: "User",
       required: true,
     },
     status: {
