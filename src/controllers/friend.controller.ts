@@ -115,6 +115,8 @@ export const deleteFriendRequest = async (
   }
 };
 
+//getMyFriendRequests
+
 export const getMyFriendRequests = async (
   req: Request,
   res: Response,
