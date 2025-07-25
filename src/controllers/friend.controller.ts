@@ -79,7 +79,10 @@ export const acceptFriendRequest = async (
       receiver: request.receiver,
       message: "accepted your friend request",
     });
-    await request.save();
+    res.status(200).json({
+      message: "Friend request accepted",
+      requestId: request._id,
+    });
   } catch (error) {
     next(error);
   }
