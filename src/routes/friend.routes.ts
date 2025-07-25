@@ -12,7 +12,7 @@ friendRequestRouter.post(
   sendFriendRequest as RequestHandler
 );
 friendRequestRouter.patch(
-  "/accept-requests",
+  "/accept-requests/:id",
   acceptFriendRequest as RequestHandler
 );
 friendRequestRouter.delete(
