@@ -74,7 +74,7 @@ export const acceptFriendRequest = async (
     }
 
     request.status = "accepted";
-
+    await request.save();
     io.to(request.sender.toString()).emit("friendRequestAccepted", {
       receiver: request.receiver,
       message: "accepted your friend request",
@@ -134,6 +134,35 @@ export const getMyFriendRequests = async (
     }).populate("sender", "name username email profileImage");
 
     res.status(200).json(requests);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getMyFriends = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+
+    const acceptedRequests = await FriendRequest.find({
+      status: "accepted",
+      $or: [{ sender: id }, { receiver: id }],
+    })
+      .populate("sender", "name username profileImage email")
+      .populate("receiver", "name username profileImage email");
+
+    const friends = acceptedRequests.map((req) => {
+      if (req.sender._id.toString() === id) {
+        return req.receiver;
+      } else {
+        return req.sender;
+      }
+    });
+
+    res.status(200).json(friends);
   } catch (error) {
     next(error);
   }

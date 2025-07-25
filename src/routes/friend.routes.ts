@@ -23,5 +23,9 @@ friendRequestRouter.get(
   "/myFriendRequests/:id",
   getMyFriendRequests as RequestHandler
 );
+friendRequestRouter.get(
+  "/myFriends/:id",
+  getMyFriendRequests as RequestHandler
+);
 
 export default friendRequestRouter;
