@@ -67,7 +67,7 @@ export const acceptFriendRequest = async (
   next: NextFunction
 ) => {
   try {
-    const { id } = req.body;
+    const { id } = req.params;
     const request = await FriendRequest.findById(id);
     if (!request) {
       return res.status(400).json({ message: "Request not found" });

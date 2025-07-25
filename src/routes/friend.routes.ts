@@ -11,7 +11,7 @@ friendRequestRouter.post(
   "/friend-requests",
   sendFriendRequest as RequestHandler
 );
-friendRequestRouter.post(
+friendRequestRouter.patch(
   "/accept-requests",
   acceptFriendRequest as RequestHandler
 );
