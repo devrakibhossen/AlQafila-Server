@@ -139,6 +139,24 @@ export const getMyFriendRequests = async (
     next(error);
   }
 };
+
+export const getSentRequest = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const sentRequest = await FriendRequest.find({
+      sender: id,
+      status: "pending",
+    }).populate("receiver", "name username email profileImage");
+    res.status(200).json(sentRequest);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getMyFriends = async (
   req: Request,
   res: Response,

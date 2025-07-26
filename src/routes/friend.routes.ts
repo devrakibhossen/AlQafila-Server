@@ -5,6 +5,7 @@ import {
   getMyFriendRequests,
   getMyFriends,
   getPeopleAroundYou,
+  getSentRequest,
   sendFriendRequest,
 } from "../controllers/friend.controller.js";
 
@@ -24,6 +25,10 @@ friendRequestRouter.delete(
 friendRequestRouter.get(
   "/myFriendRequests/:id",
   getMyFriendRequests as RequestHandler
+);
+friendRequestRouter.get(
+  "/mySentRequests/:id",
+  getSentRequest as RequestHandler
 );
 friendRequestRouter.get("/myFriends/:id", getMyFriends as RequestHandler);
 friendRequestRouter.get(
