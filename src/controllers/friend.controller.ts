@@ -138,28 +138,30 @@ export const getMyFriendRequests = async (
     next(error);
   }
 };
-
 export const getMyFriends = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  try {
-    const { id } = req.params;
+  const { id: myUserId } = req.params;
 
+  try {
     const acceptedRequests = await FriendRequest.find({
       status: "accepted",
-      $or: [{ sender: id }, { receiver: id }],
-    })
-      .populate("sender", "name username profileImage email")
-      .populate("receiver", "name username profileImage email");
+      $or: [{ sender: myUserId }, { receiver: myUserId }],
+    }).populate([
+      {
+        path: "sender",
+        select: "username name profileImage email",
+      },
+      {
+        path: "receiver",
+        select: "username name profileImage email",
+      },
+    ]);
 
     const friends = acceptedRequests.map((req) => {
-      if (req.sender._id.toString() === id) {
-        return req.receiver;
-      } else {
-        return req.sender;
-      }
+      return req.sender._id.toString() === myUserId ? req.receiver : req.sender;
     });
 
     res.status(200).json(friends);

@@ -3,6 +3,7 @@ import {
   acceptFriendRequest,
   deleteFriendRequest,
   getMyFriendRequests,
+  getMyFriends,
   sendFriendRequest,
 } from "../controllers/friend.controller.js";
 
@@ -23,9 +24,6 @@ friendRequestRouter.get(
   "/myFriendRequests/:id",
   getMyFriendRequests as RequestHandler
 );
-friendRequestRouter.get(
-  "/myFriends/:id",
-  getMyFriendRequests as RequestHandler
-);
+friendRequestRouter.get("/myFriends/:id", getMyFriends as RequestHandler);
 
 export default friendRequestRouter;
