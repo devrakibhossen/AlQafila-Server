@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import FriendRequest from "../models/friendrequest.model.js";
 import Notification from "../models/notification.model.js";
 import { io } from "../app.js";
+import User from "../models/user.model.js";
 
 export const sendFriendRequest = async (
   req: Request,
@@ -165,6 +166,52 @@ export const getMyFriends = async (
     });
 
     res.status(200).json(friends);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getPeopleAroundYou = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id: loggedInUserId } = req.params;
+    // Step 1: Sent requests
+    const sentRequests = await FriendRequest.find({
+      sender: loggedInUserId,
+    }).select("receiver");
+
+    // Step 2: Accepted friends
+    const acceptedFriends = await FriendRequest.find({
+      $or: [{ sender: loggedInUserId }, { receiver: loggedInUserId }],
+      status: "accepted",
+    }).select("sender receiver");
+
+    // Step 3: Create exclusion set
+    const excludeIds = new Set();
+
+    sentRequests.forEach((req) => {
+      excludeIds.add(req.receiver.toString());
+    });
+
+    acceptedFriends.forEach((friend) => {
+      const friendId =
+        friend.sender.toString() === loggedInUserId.toString()
+          ? friend.receiver.toString()
+          : friend.sender.toString();
+      excludeIds.add(friendId);
+    });
+
+    excludeIds.add(loggedInUserId.toString());
+
+    // Step 4: Find users excluding the above
+    const users = await User.find({
+      _id: { $nin: Array.from(excludeIds) },
+    }).select("username email name profileImage");
+
+    res.status(200).json(users);
   } catch (error) {
     next(error);
   }
