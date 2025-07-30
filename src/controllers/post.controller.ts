@@ -58,7 +58,9 @@ export const getPost = async (
   next: NextFunction
 ) => {
   try {
-    const posts = await Post.find().sort({ createdAt: -1 });
+    const posts = await Post.find()
+      .sort({ createdAt: -1 })
+      .populate("authorId", "name username profileImage email");
     res.status(200).json({
       success: true,
       data: posts,
