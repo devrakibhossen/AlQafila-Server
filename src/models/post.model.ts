@@ -27,7 +27,7 @@ export enum ProfileStatus {
   Unfollowed = "unfollowed",
 }
 export interface IPost extends Document {
-  authorEmail: string;
+  authorId: mongoose.Types.ObjectId;
   text: string;
   hashtags?: string[];
   reactions?: IReactions;
@@ -44,7 +44,11 @@ export interface IPost extends Document {
 
 const postSchema: Schema<IPost> = new mongoose.Schema(
   {
-    authorEmail: { type: String, required: true },
+    authorId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     text: { type: String, required: true },
     hashtags: [{ type: String }],
     reactions: {

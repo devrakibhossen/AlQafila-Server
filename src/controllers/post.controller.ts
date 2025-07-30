@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import Post from "../models/post.model.js";
+import mongoose from "mongoose";
 // addPost
+
 export const addPost = async (
   req: Request,
   res: Response,
@@ -8,7 +10,7 @@ export const addPost = async (
 ) => {
   try {
     const {
-      authorEmail,
+      authorId,
       text,
       hashtags,
       reactions,
@@ -19,11 +21,11 @@ export const addPost = async (
       views,
     } = req.body;
 
-    if (!authorEmail || !text) {
+    if (!authorId || !text) {
       throw new Error("All fields are required");
     }
     const newPost = await Post.create({
-      authorEmail,
+      authorId: new mongoose.Types.ObjectId(authorId),
       text,
       hashtags,
       reactions,
@@ -34,7 +36,10 @@ export const addPost = async (
       views,
     });
 
-    const fullPost = await Post.findById(newPost._id);
+    const fullPost = await Post.findById(newPost._id).populate(
+      "authorId",
+      "name username profileImage email"
+    );
     return res.status(201).json({
       success: true,
       message: "Post created successfully",
