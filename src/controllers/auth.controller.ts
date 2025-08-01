@@ -155,8 +155,23 @@ export const socialSignIn = async (
   }
 };
 
-// export const signOut = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {};
+export const signOut = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "User signed out successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
