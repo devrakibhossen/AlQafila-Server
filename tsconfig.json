@@ -9,7 +9,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "types": ["node", "express"]
+    "types": ["node"]
   },
   "include": ["src", "env.d.ts"]
 }
