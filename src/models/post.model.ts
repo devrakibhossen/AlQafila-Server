@@ -9,16 +9,16 @@ export interface IMediaVideo {
   type: "video";
   video: string;
 }
-export interface IReactions {
-  like: number;
-  love: number;
-  smart: number;
-  funny: number;
-  wow: number;
-  sad: number;
-  angry: number;
-  total: number;
-}
+// export interface IReactions {
+//   like: number;
+//   love: number;
+//   smart: number;
+//   funny: number;
+//   wow: number;
+//   sad: number;
+//   angry: number;
+//   total: number;
+// }
 export enum ProfileStatus {
   Follow = "follow",
   Following = "following",
@@ -30,7 +30,7 @@ export interface IPost extends Document {
   authorId: mongoose.Types.ObjectId;
   text: string;
   hashtags?: string[];
-  reactions?: IReactions;
+  // reactions?: IReactions;
   shares?: number;
   images?: IMediaImage[];
   video?: IMediaVideo;
@@ -51,16 +51,16 @@ const postSchema: Schema<IPost> = new mongoose.Schema(
     },
     text: { type: String, required: true },
     hashtags: [{ type: String }],
-    reactions: {
-      like: { type: Number, default: 0 },
-      love: { type: Number, default: 0 },
-      smart: { type: Number, default: 0 },
-      funny: { type: Number, default: 0 },
-      wow: { type: Number, default: 0 },
-      sad: { type: Number, default: 0 },
-      angry: { type: Number, default: 0 },
-      total: { type: Number, default: 0 },
-    },
+    // reactions: {
+    //   like: { type: Number, default: 0 },
+    //   love: { type: Number, default: 0 },
+    //   smart: { type: Number, default: 0 },
+    //   funny: { type: Number, default: 0 },
+    //   wow: { type: Number, default: 0 },
+    //   sad: { type: Number, default: 0 },
+    //   angry: { type: Number, default: 0 },
+    //   total: { type: Number, default: 0 },
+    // },
     shares: { type: Number, default: 0 },
     images: [
       {
