@@ -11,6 +11,7 @@ import friendRequestRouter from "./routes/friend.routes.js";
 import followRouter from "./routes/follow.routes.js";
 import { Server } from "socket.io";
 import * as http from "http";
+import reactionRouter from "./routes/reaction.routes.js";
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use("/api/v1/users", userRouter);
 app.use("/api/v1/posts", postRouter);
 app.use("/api/v1/friend", friendRequestRouter);
 app.use("/api/v1/follow", followRouter);
+app.use("/api/v1/reaction", reactionRouter);
 app.use(errorMiddleware);
 const server = http.createServer(app);
 export const io = new Server(server);
