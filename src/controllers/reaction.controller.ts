@@ -9,7 +9,7 @@ export const addReaction = async (
 ) => {
   const { postId, userId, type } = req.body;
 
-  if (!postId || !userId || !type) {
+  if (!postId || !userId) {
     return res.status(400).json({ message: "Missing required fields" });
   }
 
@@ -17,7 +17,7 @@ export const addReaction = async (
     const existingReaction = await Reaction.findOne({ postId, userId });
 
     if (existingReaction) {
-      if (existingReaction.type === type) {
+      if (type === null) {
         await Reaction.deleteOne({ _id: existingReaction._id });
         return res.status(200).json({ message: "Reaction removed" });
       } else {
