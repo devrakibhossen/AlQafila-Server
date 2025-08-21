@@ -95,3 +95,31 @@ export const updatePost = async (
     next(error);
   }
 };
+
+export const getPostDetails = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id, slug } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid Post Id" });
+    }
+
+    const post = await Post.findOne({
+      _id: id,
+      slug: { $regex: `^${decodeURIComponent(slug)}$`, $options: "i" },
+    }).populate("authorId", "name username profileImage");
+    if (!post) {
+      return res.status(404).json({ message: "Post Not Found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: post,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

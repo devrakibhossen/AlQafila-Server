@@ -1,4 +1,6 @@
 import mongoose, { Model, Schema, Document } from "mongoose";
+import slugify from "slugify";
+import { transliterate } from 'transliteration';
 
 export interface IMediaImage {
   type: "image";
@@ -9,16 +11,7 @@ export interface IMediaVideo {
   type: "video";
   video: string;
 }
-// export interface IReactions {
-//   like: number;
-//   love: number;
-//   smart: number;
-//   funny: number;
-//   wow: number;
-//   sad: number;
-//   angry: number;
-//   total: number;
-// }
+
 export enum ProfileStatus {
   Follow = "follow",
   Following = "following",
@@ -29,8 +22,8 @@ export enum ProfileStatus {
 export interface IPost extends Document {
   authorId: mongoose.Types.ObjectId;
   text: string;
+  slug: string;
   hashtags?: string[];
-  // reactions?: IReactions;
   shares?: number;
   images?: IMediaImage[];
   video?: IMediaVideo;
@@ -50,17 +43,8 @@ const postSchema: Schema<IPost> = new mongoose.Schema(
       required: true,
     },
     text: { type: String, required: true },
+    slug: { type: String, unique: true },
     hashtags: [{ type: String }],
-    // reactions: {
-    //   like: { type: Number, default: 0 },
-    //   love: { type: Number, default: 0 },
-    //   smart: { type: Number, default: 0 },
-    //   funny: { type: Number, default: 0 },
-    //   wow: { type: Number, default: 0 },
-    //   sad: { type: Number, default: 0 },
-    //   angry: { type: Number, default: 0 },
-    //   total: { type: Number, default: 0 },
-    // },
     shares: { type: Number, default: 0 },
     images: [
       {
@@ -97,6 +81,31 @@ const postSchema: Schema<IPost> = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+postSchema.pre("save", function (next) {
+  if (this.isModified("text") || !this.slug) {
+    const transliteratedText = transliterate(this.text || '');
+
+    let baseSlug = slugify(transliteratedText, {
+      lower: true,
+      strict: true,
+      locale: 'en',
+      trim: true,
+    });
+
+    if (!baseSlug) baseSlug = 'post';
+
+    if (baseSlug.length > 50) {
+      baseSlug = baseSlug.substring(0, 50).replace(/-+$/, '');
+    }
+
+    const id = this._id as mongoose.Types.ObjectId;
+    this.slug = `${baseSlug}-${id.toString().slice(-6)}`;
+  }
+  next();
+});
+
+
 
 const Post: Model<IPost> = mongoose.model<IPost>("Post", postSchema);
 export default Post;
