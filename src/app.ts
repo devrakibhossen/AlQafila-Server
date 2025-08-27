@@ -12,6 +12,7 @@ import followRouter from "./routes/follow.routes.js";
 import { Server } from "socket.io";
 import * as http from "http";
 import reactionRouter from "./routes/reaction.routes.js";
+import commentRouter from "./routes/comment.routes.js";
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.use("/api/v1/posts", postRouter);
 app.use("/api/v1/friend", friendRequestRouter);
 app.use("/api/v1/follow", followRouter);
 app.use("/api/v1/reaction", reactionRouter);
+app.use("/api/v1/comment", commentRouter);
 app.use(errorMiddleware);
 const server = http.createServer(app);
 export const io = new Server(server);
