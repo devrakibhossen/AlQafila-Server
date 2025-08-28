@@ -40,8 +40,15 @@ export const getComment = async (
   res: Response,
   next: NextFunction
 ) => {
+  const postId = req.params.id;
+
+  if (!mongoose.Types.ObjectId.isValid(postId)) {
+    return res.status(400).json({ message: "Invalid postId" });
+  }
   try {
-    const comment = await Comment.find()
+    const comment = await Comment.find({
+      postId: new mongoose.Types.ObjectId(postId),
+    })
       .sort({ createdAt: -1 })
       .populate("authorId", "name username profileImage");
 

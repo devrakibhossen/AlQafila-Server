@@ -9,7 +9,7 @@ import {
 const commentRouter = Router();
 
 commentRouter.post("/", addComment);
-commentRouter.get("/", getComment);
+commentRouter.get("/:id", getComment);
 // commentRouter.delete("/", deleteComment);
 // commentRouter.put("/", updateComment);
 
