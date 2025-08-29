@@ -61,14 +61,58 @@ export const getComment = async (
   }
 };
 
-// export const deleteComment = (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {};
+export const deleteComment = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const commentId = req.params.id;
+    const deletedComment = await Comment.findByIdAndDelete(commentId);
+    if (!deletedComment) {
+      return res.status(404).json({
+        success: false,
+        message: "Comment not found",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "User deleted successfully",
+      deletedComment,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
-// export const updateComment = (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {};
+export const updateComment = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const commentId = req.params.id;
+    const { content } = req.body;
+
+    const updatedComment = await Comment.findOneAndUpdate(
+      { _id: commentId },
+      { content },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedComment) {
+      return res.status(404).json({
+        success: false,
+        message: "Comment not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Comment updated successfully",
+      updatedComment,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
